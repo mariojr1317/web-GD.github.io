@@ -54,7 +54,7 @@
 - **All Objects Working** - In the current state of Web Dashers, you might notice some objects seem to be bugged, such as a lack of animations, and coloring being incorrect.
 
 ### Come try out the WIP Web Dashers demo at:
-**[web-dashers.github.io](https://mariojr1317.github.io/web-GD.github.io/)**
+**[web-GD.github.io](https://mariojr1317.github.io/web-GD.github.io/)**
 
 <sub> Last updated: 8/7/2026
 
