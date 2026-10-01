@@ -36,7 +36,7 @@
 ---
 
 ## Features currently implemented:
-- **Main Menu** - A mostly fully working main menu with all 2.1 levels.
+- **Main Menu** - A mostly fully working main menu with all 2.2 levels*.
 - **Online Levels** - You can play online levels, and create your own!
 - **Icon Kit** - A working Icon Kit with different colors and icons to choose from! (Currently not including 2.2 icons.)
 - **Different Gamemodes** - Just about every gamemode is implemented currently, with the exception of the Swing.
@@ -61,3 +61,5 @@
 ---
 > - <sub>Special thanks to all of the people that help the project by contributing, and Please support us by starring the repo, as it helps us out a ton!!<sub>
 > - <sub>Also, please report bugs found to the Discord server or the Issues page on github, just please dont be annoying about it, and don't make bug reports about bugs already being worked on or ones that are already known about.<sub>
+
+*Not all game modes or triggers are included, which makes the 2.2 level (Dash) unplayable.
