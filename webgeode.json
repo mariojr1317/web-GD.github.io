@@ -1,0 +1,9 @@
+{
+  "format": 1,
+  "name": "Web Dashers WebGeode",
+  "version": "0.1.0",
+  "runtime": "web",
+  "nativeGeodeCompatible": false,
+  "description": "A Geode-inspired mod API for Web Dashers. Native .geode binaries are not loaded in the browser.",
+  "entrypoint": "assets/scripts/geode/webgeode.js"
+}
