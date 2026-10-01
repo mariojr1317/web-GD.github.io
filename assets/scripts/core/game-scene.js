@@ -4147,15 +4147,13 @@ this._menuUpdateLogBtn = this.add.image(screenWidth - 30 - 50, 33, "GJ_WebSheet"
     const arrowL = this.add.image(55, cy - 25, "GJ_GameSheet03", "navArrowBtn_001.png").setScrollFactor(0).setDepth(154).setScale(1.1).setFlipX(true).setInteractive();
     const arrowR = this.add.image(sw - 55, cy - 25, "GJ_GameSheet03", "navArrowBtn_001.png").setScrollFactor(0).setDepth(154).setScale(1.1).setFlipX(false).setInteractive();
     const allLevels = window.allLevels || [];
-    const visibleLevels = allLevels.filter(level => !(level && level[2] === "level_22"));
-    const pageCount = visibleLevels.length + 1;
+    // All official levels included in allLevels are selectable, including Dash (level 22).
+    const visibleLevels = allLevels;
+    const pageCount = visibleLevels.length;
     let currentPageIndex = visibleLevels.findIndex(l => l[2] === window.currentlevel[2]);
     if (currentPageIndex < 0) currentPageIndex = 0;
-    const isComingSoonPage = () => currentPageIndex >= visibleLevels.length;
-    const getPageLevel = () => {
-      if (isComingSoonPage()) return visibleLevels[visibleLevels.length - 1] || window.currentlevel || [];
-      return visibleLevels[currentPageIndex] || window.currentlevel || [];
-    };
+    const isComingSoonPage = () => false;
+    const getPageLevel = () => visibleLevels[currentPageIndex] || window.currentlevel || [];
     const applyCurrentPage = () => {
       this._levelSelectIsComingSoonPage = isComingSoonPage();
       if (!isComingSoonPage() && visibleLevels[currentPageIndex]) {
