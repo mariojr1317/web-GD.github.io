@@ -62,4 +62,4 @@
 > - <sub>Special thanks to all of the people that help the project by contributing, and Please support us by starring the repo, as it helps us out a ton!!<sub>
 > - <sub>Also, please report bugs found to the Discord server or the Issues page on github, just please dont be annoying about it, and don't make bug reports about bugs already being worked on or ones that are already known about.<sub>
 
-*Not all game modes or triggers are included, which makes the 2.2 level (Dash) unplayable.
+> - <sub>*Not all game modes or triggers are included, which makes the 2.2 level (Dash) unplayable.
