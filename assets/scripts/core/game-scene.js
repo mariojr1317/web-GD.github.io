@@ -629,6 +629,53 @@ this._menuUpdateLogBtn = this.add.image(screenWidth - 30 - 50, 33, "GJ_WebSheet"
     this._makeBouncyButton(this._menuNewgroundsBtn, 1, () => {
       this._buildNewgroundsPopup();
     }, () => this._menuActive && !this._newgroundsPopup);
+    // WebGeode mod menu button (bottom-right)
+    this._webGeodeMenu = null;
+    this._openWebGeodeMenu = () => {
+      if (this._webGeodeMenu) return;
+      const sw = screenWidth;
+      const sh = screenHeight;
+      const objects = [];
+      const panel = this.add.graphics().setScrollFactor(0).setDepth(900);
+      panel.fillStyle(0x101b2e, 0.97);
+      panel.fillRoundedRect(sw * 0.18, sh * 0.12, sw * 0.64, sh * 0.76, 24);
+      panel.lineStyle(5, 0x5ac8ff, 0.9);
+      panel.strokeRoundedRect(sw * 0.18, sh * 0.12, sw * 0.64, sh * 0.76, 24);
+      objects.push(panel);
+      const title = this.add.bitmapText(sw / 2, sh * 0.19, "bigFont", "WEBGEODE", 52).setScrollFactor(0).setDepth(901).setOrigin(0.5);
+      this._fitBitmapText(title, sw * 0.48);
+      objects.push(title);
+      const mods = window.WebGeode?.getMods?.() || [];
+      if (!mods.length) {
+        const empty = this.add.bitmapText(sw / 2, sh * 0.42, "bigFont", "No mods loaded", 34).setScrollFactor(0).setDepth(901).setOrigin(0.5);
+        this._fitBitmapText(empty, sw * 0.45);
+        objects.push(empty);
+      } else {
+        mods.forEach((mod, index) => {
+          const y = sh * 0.32 + index * 62;
+          const modText = this.add.bitmapText(sw * 0.27, y, "bigFont", mod.name + "  v" + mod.version, 30).setScrollFactor(0).setDepth(901).setOrigin(0, 0.5);
+          this._fitBitmapText(modText, sw * 0.38);
+          objects.push(modText);
+        });
+      }
+      const close = this.add.image(sw * 0.78, sh * 0.19, "GJ_GameSheet03", "GJ_closeBtn_001.png").setScrollFactor(0).setDepth(902).setInteractive();
+      this._makeBouncyButton(close, 1, () => this._closeWebGeodeMenu());
+      objects.push(close);
+      this._webGeodeMenu = { objects };
+    };
+    this._closeWebGeodeMenu = () => {
+      if (!this._webGeodeMenu) return;
+      for (const object of this._webGeodeMenu.objects) {
+        if (object?.destroy) object.destroy();
+      }
+      this._webGeodeMenu = null;
+    };
+    this._menuGeodeBtn = this.add.image(screenWidth - 55, screenHeight - 55, "GJ_GameSheet03", "GJ_rateDiffBtnMod_001.png").setScrollFactor(0).setDepth(31).setInteractive();
+    this._expandHitArea(this._menuGeodeBtn, 1.15);
+    this._makeBouncyButton(this._menuGeodeBtn, 1, () => {
+      this._openWebGeodeMenu();
+    }, () => this._menuActive && !this._webGeodeMenu);
+
     this._menuGlitter = this.add.particles(0, 0, "GJ_WebSheet", {
       frame: "square.png",
       speed: 0,
