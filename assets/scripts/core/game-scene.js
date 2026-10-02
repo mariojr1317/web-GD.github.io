@@ -670,7 +670,7 @@ this._menuUpdateLogBtn = this.add.image(screenWidth - 30 - 50, 33, "GJ_WebSheet"
       }
       this._webGeodeMenu = null;
     };
-    this._menuGeodeBtn = this.add.image(this.scale.width - 45, this.scale.height - 45, "GJ_GameSheet03", "GJ_rateDiffBtnMod_001.png")
+    this._menuGeodeBtn = this.add.image(this.scale.width - 45, this.scale.height - 45, "GJ_GameSheet03", "modBadge_01_001.png")
       .setScrollFactor(0)
       .setOrigin(0.5)
       .setDepth(100)
