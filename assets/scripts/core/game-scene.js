@@ -670,11 +670,18 @@ this._menuUpdateLogBtn = this.add.image(screenWidth - 30 - 50, 33, "GJ_WebSheet"
       }
       this._webGeodeMenu = null;
     };
-    this._menuGeodeBtn = this.add.image(screenWidth - 32, screenHeight - 32, "GJ_GameSheet03", "GJ_rateDiffBtnMod_001.png").setScrollFactor(0).setDepth(31).setScale(0.7).setInteractive();
-    this._expandHitArea(this._menuGeodeBtn, 1.15);
-    this._makeBouncyButton(this._menuGeodeBtn, 0.7, () => {
+    this._menuGeodeBtn = this.add.image(this.scale.width - 45, this.scale.height - 45, "GJ_GameSheet03", "GJ_rateDiffBtnMod_001.png")
+      .setScrollFactor(0)
+      .setOrigin(0.5)
+      .setDepth(100)
+      .setScale(0.55)
+      .setAlpha(1)
+      .setVisible(true)
+      .setInteractive();
+    this._expandHitArea(this._menuGeodeBtn, 1.2);
+    this._makeBouncyButton(this._menuGeodeBtn, 0.55, () => {
       this._openWebGeodeMenu();
-    }, () => this._menuActive && !this._webGeodeMenu);
+    });
 
     this._menuGlitter = this.add.particles(0, 0, "GJ_WebSheet", {
       frame: "square.png",
