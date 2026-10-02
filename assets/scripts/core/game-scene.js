@@ -645,6 +645,33 @@ this._menuUpdateLogBtn = this.add.image(screenWidth - 30 - 50, 33, "GJ_WebSheet"
       const title = this.add.bitmapText(sw / 2, sh * 0.19, "bigFont", "WEBGEODE", 52).setScrollFactor(0).setDepth(901).setOrigin(0.5);
       this._fitBitmapText(title, sw * 0.48);
       objects.push(title);
+
+      const importInput = document.createElement("input");
+      importInput.type = "file";
+      importInput.accept = ".geode,application/octet-stream";
+      importInput.style.display = "none";
+      importInput.addEventListener("change", async () => {
+        const file = importInput.files?.[0];
+        if (!file) return;
+        try {
+          const mod = await window.WebGeode.importGeode(file);
+          console.log("[WebGeode] Imported:", mod);
+          this._closeWebGeodeMenu();
+        } catch (error) {
+          console.error("[WebGeode] Import failed:", error);
+          window.alert("No se pudo importar el .geode: " + error.message);
+        } finally {
+          importInput.value = "";
+        }
+      });
+      document.body.appendChild(importInput);
+      objects.push({ destroy: () => importInput.remove() });
+
+      const importBtn = this.add.bitmapText(sw / 2, sh * 0.28, "bigFont", "IMPORT .GEODE", 30)
+        .setScrollFactor(0).setDepth(902).setOrigin(0.5).setInteractive();
+      this._fitBitmapText(importBtn, sw * 0.38);
+      importBtn.on("pointerup", () => importInput.click());
+      objects.push(importBtn);
       const mods = window.WebGeode?.getMods?.() || [];
       if (!mods.length) {
         const empty = this.add.bitmapText(sw / 2, sh * 0.42, "bigFont", "No mods loaded", 34).setScrollFactor(0).setDepth(901).setOrigin(0.5);
