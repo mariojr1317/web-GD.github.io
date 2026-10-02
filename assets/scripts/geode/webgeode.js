@@ -19,8 +19,127 @@
     return map.get(key);
   };
 
-  const api = {
-    version: "0.1.0-web",
+
+  const decodeText = bytes => new TextDecoder().decode(bytes);
+
+  const readU16 = (v, o) => v.getUint16(o, true);
+  const readU32 = (v, o) => v.getUint32(o, true);
+
+  async function unzipGeode(buffer) {
+    const bytes = new Uint8Array(buffer);
+    const view = new DataView(buffer);
+    let eocd = -1;
+    for (let i = bytes.length - 22; i >= Math.max(0, bytes.length - 65557); i--) {
+      if (readU32(view, i) === 0x06054b50) {
+        eocd = i;
+        break;
+      }
+    }
+    if (eocd < 0) throw new Error("Invalid .geode: ZIP directory not found");
+
+    const count = readU16(view, eocd + 10);
+    const centralOffset = readU32(view, eocd + 16);
+    let offset = centralOffset;
+    const files = new Map();
+
+    for (let i = 0; i < count; i++) {
+      if (readU32(view, offset) !== 0x02014b50) throw new Error("Invalid .geode: bad ZIP entry");
+      const method = readU16(view, offset + 10);
+      const compressedSize = readU32(view, offset + 20);
+      const nameLength = readU16(view, offset + 28);
+      const extraLength = readU16(view, offset + 30);
+      const commentLength = readU16(view, offset + 32);
+      const localOffset = readU32(view, offset + 42);
+      const name = decodeText(bytes.subarray(offset + 46, offset + 46 + nameLength));
+
+      const localNameLength = readU16(view, localOffset + 26);
+      const localExtraLength = readU16(view, localOffset + 28);
+      const dataStart = localOffset + 30 + localNameLength + localExtraLength;
+      const compressed = bytes.slice(dataStart, dataStart + compressedSize);
+
+      let data;
+      if (method === 0) {
+        data = compressed;
+      } else if (method === 8) {
+        if (typeof DecompressionStream !== "function") {
+          throw new Error("This browser does not support ZIP/DEFLATE decompression");
+        }
+        const stream = new Blob([compressed]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+        data = new Uint8Array(await new Response(stream).arrayBuffer());
+      } else {
+        throw new Error(`Unsupported ZIP compression method: ${method}`);
+      }
+      files.set(name, data);
+      offset += 46 + nameLength + extraLength + commentLength;
+    }
+    return files;
+  }
+
+  async function importGeodeFile(file, api) {
+    if (!(file instanceof File)) throw new TypeError("WebGeode.importGeode requires a .geode file");
+    if (!file.name.toLowerCase().endsWith(".geode")) throw new Error("Only .geode files are supported");
+
+    const files = await unzipGeode(await file.arrayBuffer());
+    const manifestBytes = files.get("mod.json") || files.get("mod.jsonc");
+    if (!manifestBytes) throw new Error("This .geode does not contain mod.json");
+
+    let manifest;
+    try {
+      manifest = JSON.parse(decodeText(manifestBytes).replace(/\/\/.*$/gm, ""));
+    } catch {
+      throw new Error("The .geode mod.json could not be parsed");
+    }
+
+    const id = manifest.id || manifest.gd?.id || manifest.name;
+    if (!id) throw new Error("mod.json does not define a mod id");
+
+    const nativeFiles = [...files.keys()].filter(name => /\.(dll|so|dylib|exe)$/i.test(name));
+    const scriptCandidates = [
+      manifest.entrypoint,
+      manifest.main,
+      "scripts/main.js",
+      "scripts/mod.js",
+      "mod.js"
+    ].filter(Boolean);
+    const entry = scriptCandidates.find(name => files.has(name));
+
+    const mod = api.registerMod({
+      id: String(id),
+      name: manifest.name || String(id),
+      version: manifest.version || "0.0.0",
+      author: manifest.author || manifest.developer || "Unknown"
+    });
+
+    mod.package = {
+      fileName: file.name,
+      files: [...files.keys()],
+      manifest,
+      nativeOnly: !entry,
+      nativeFiles
+    };
+
+    if (entry) {
+      const source = decodeText(files.get(entry));
+      const blobUrl = URL.createObjectURL(new Blob([source], { type: "text/javascript" }));
+      try {
+        await import(blobUrl);
+      } finally {
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 0);
+      }
+      mod.package.entrypoint = entry;
+      mod.package.loaded = true;
+    } else {
+      mod.package.loaded = false;
+      mod.package.reason = nativeFiles.length
+        ? "Native code is not executable in the browser"
+        : "No JavaScript/WebAssembly entrypoint was found";
+    }
+
+    api.emit("mod.imported", mod);
+    return mod;
+  }
+\n  const api = {
+    version: "0.2.0-web",\n\n    async importGeode(file) { return importGeodeFile(file, api); },
 
     registerMod(mod) {
       if (!mod || typeof mod.id !== "string" || !mod.id.trim()) {
